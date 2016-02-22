@@ -18,11 +18,23 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  console.log("Logged in now?");
   res.redirect('/');
 });
 
+app.get('/register', (req, res) => {
+  res.render('register');
+});
 
+app.post('/register', (req, res) => {
+  if (req.body.password === req.body.verify) {
+    res.redirect('/login');
+  } else {
+    res.render('register', {
+      message: "Passwords don't match, ya dingus!",
+      email: req.body.email
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Node.js server started. Listening on port ${PORT}`);
