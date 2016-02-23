@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
@@ -17,7 +18,9 @@ app.use(bodyParser.urlencoded( {extended: false} ) );
 app.use(methodOverride('_method'));
 app.use(session({
   secret: SESSION_SECRET,
-  store: new RedisStore()
+  store: new RedisStore(),
+  resave: false,
+  saveUninitialized: false
 }));
 app.use((req, res, next) => {
   req.session.visits = req.session.visits || {};
@@ -27,12 +30,15 @@ app.use((req, res, next) => {
   console.log(req.session);
   next();
 });
-app.use(userRoutes);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use((req, res, next) => {
-  res.locals.user = req.session.user || {email: 'Guest'};
+  res.locals.user = req.user;
   next();
 })
+
+app.use(userRoutes);
 
 app.get('/', (req, res) => {
   res.render('index');
