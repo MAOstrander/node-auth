@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
+const methodOverride = require('method-override');
 
 const userRoutes = require('./lib/user/routes');
 const app = express();
@@ -13,6 +14,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'secretsquirrel';
 app.set('view engine', 'jade')
 
 app.use(bodyParser.urlencoded( {extended: false} ) );
+app.use(methodOverride('_method'));
 app.use(session({
   secret: SESSION_SECRET,
   store: new RedisStore()
