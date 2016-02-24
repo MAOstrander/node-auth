@@ -1,5 +1,6 @@
 'use strict';
 const express = require('express');
+const flash = require('connect-flash');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const bodyParser = require('body-parser');
@@ -30,20 +31,25 @@ app.use((req, res, next) => {
   console.log(req.session);
   next();
 });
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
-})
+});
+
+app.use((req, res, next) => {
+  res.locals.messages = req.flash();
+  next();
+});
 
 app.use(userRoutes);
 
 app.get('/', (req, res) => {
   res.render('index');
 });
-
 
 mongoose.connect('mongodb://localhost:27017/node-auth', (err) => {
   if (err) throw err;
